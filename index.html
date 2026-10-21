@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Purchasing Power — Prices, pay, and the space between</title>
+  <meta name="description" content="An independent economic dashboard tracking US consumer prices, wages, and purchasing power using official BLS data. Includes a salary inflation calculator.">
+  <meta name="theme-color" content="#f6f4ee">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="math.js" defer></script><script src="data.js" defer></script><script src="status.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead wrap">
+  <a class="wordmark" href="#" aria-label="Purchasing Power home"><svg width="29" height="29" viewBox="0 0 29 29" aria-hidden="true"><path d="M2 25V16H7V25M12 25V10H17V25M22 25V3H27V25" fill="none" stroke="currentColor" stroke-width="2"/></svg> Purchasing Power<span class="edition">U.S. ECONOMIC OBSERVATORY</span></a>
+  <nav aria-label="Main navigation"><a href="#overview">Overview</a><a href="#calculator">Your money</a><a href="#sources">Sources &amp; method</a><a class="source-link" href="https://github.com/Geezusotl/purchasing-power">GitHub ↗</a></nav>
+</header>
+<main id="main" class="wrap">
+  <div class="dateline"><span>UNITED STATES · MONTHLY DATA</span><span id="release-label">Official BLS observations</span></div>
+  <section class="intro" id="overview">
+    <div><h1>Prices, pay, and<br>the space between.</h1><p class="standfirst">A closer look at what your money buys.<br>Official economic data, put in perspective.</p></div>
+    <aside class="edition-note"><span class="eyebrow">THE LATEST READING</span><p id="reading">Loading the latest published observations…</p><a href="#trend">Explore the numbers <span aria-hidden="true">↓</span></a></aside>
+  </section>
+  <div id="health" class="health" role="status" aria-live="polite"></div>
+  <noscript><p class="notice">JavaScript is needed for the charts and calculator. The complete <a href="data/snapshot.json">official data snapshot</a> remains available.</p></noscript>
+  <section class="metrics" aria-label="Latest economic indicators">
+    <article><span class="eyebrow">CONSUMER PRICES</span><strong id="metric-inflation">—</strong><p>Change from a year earlier</p><small id="date-inflation"></small><div id="spark-inflation" class="spark"></div></article>
+    <article><span class="eyebrow">HOURLY PAY</span><strong id="metric-wages">—</strong><p>Average private-sector earnings</p><small id="date-wages"></small><div id="spark-wages" class="spark"></div></article>
+    <article><span class="eyebrow">REAL HOURLY PAY</span><strong id="metric-real">—</strong><p>Annual change after inflation</p><small id="date-real"></small><div id="spark-real" class="spark"></div></article>
+    <article><span class="eyebrow">UNEMPLOYMENT</span><strong id="metric-unemployment">—</strong><p>Share of the civilian labor force</p><small id="date-unemployment"></small><div id="spark-unemployment" class="spark"></div></article>
+  </section>
+  <section class="trend section" id="trend">
+    <div class="section-heading"><div><span class="eyebrow">01 / THE BIG PICTURE</span><h2>Is pay keeping up?</h2><p>Average hourly earnings and consumer prices, starting from the same point.</p></div><a class="text-button" href="#data-table">View data table ↓</a></div>
+    <div class="chart-toolbar"><div class="legend"><span><i class="key wages"></i>Hourly earnings</span><span><i class="key prices"></i>Consumer prices</span></div><div class="ranges" role="group" aria-label="Chart period"><button data-years="1" aria-pressed="false">1 year</button><button data-years="5" aria-pressed="true">5 years</button><button data-years="10" aria-pressed="false">10 years</button><button data-years="all" aria-pressed="false">All</button></div></div>
+    <div class="chart-meta"><span id="base-label">Index, starting month = 100</span><span id="chart-range"></span></div>
+    <div id="main-chart" class="main-chart"></div>
+    <div class="chart-readout" id="chart-readout" aria-live="polite"></div>
+    <p class="chart-footnote">Both series are seasonally adjusted. Gaps indicate missing observations. Average pay can change when the mix of jobs changes; it is not a measure of the typical worker’s raise.</p>
+    <div class="takeaway"><span class="eyebrow">OVER THIS PERIOD</span><p id="period-summary"></p></div>
+  </section>
+  <div class="split section">
+    <section id="calculator" class="calculator"><span class="eyebrow">02 / YOUR MONEY</span><h2>What would it take<br>to keep up?</h2><p class="section-copy">Find the amount that preserves the buying power of a past salary or purchase.</p>
+      <form id="calculator-form">
+        <label for="amount">Amount in U.S. dollars</label><div class="amount-field"><span aria-hidden="true">$</span><input id="amount" type="number" min="0" max="1000000000000" step="any" value="60000" inputmode="decimal" required></div>
+        <div class="date-fields"><div><label for="from-month">From</label><select id="from-month"></select></div><span class="date-arrow" aria-hidden="true">→</span><div><label for="to-month">To</label><select id="to-month"></select></div></div>
+        <button class="calculate" type="submit">Compare buying power <span aria-hidden="true">↗</span></button>
+      </form>
+      <div id="calculator-result" class="calculator-result" role="status" aria-live="polite"></div>
+      <p class="fine-print">Uses monthly CPI-U, not seasonally adjusted. This is a national average, not your personal cost of living. Amounts stay in your browser.</p>
+    </section>
+    <section class="basket"><span class="eyebrow">03 / EVERYDAY PRICES</span><h2>Not everything moves together.</h2><p class="section-copy">Annual price changes across a few familiar parts of the household budget.</p><div id="basket-rows"></div><p class="fine-print">Each row uses its latest valid observation. Shelter includes rent and owners’ equivalent rent; it is not a home-price index. Gasoline is an index, not a price per gallon.</p><div class="context-note"><span class="eyebrow">A USEFUL DISTINCTION</span><p>Slower inflation means prices are rising more slowly. It does not mean they have returned to where they were.</p></div></section>
+  </div>
+  <section class="section observations" id="data-table"><div class="section-heading"><div><span class="eyebrow">04 / THE RECORD</span><h2>Behind the chart.</h2><p>Source values for the selected chart period. Missing values stay blank in downloads.</p></div><button id="download-csv" class="text-button">Download CSV ↓</button></div><details><summary>Show monthly observations <span id="row-count"></span></summary><div class="table-scroll"><table><caption class="sr-only">Selected monthly BLS observations</caption><thead><tr><th scope="col">Month</th><th scope="col">Hourly earnings ($)</th><th scope="col">CPI-U (SA)</th><th scope="col">CPI-U (NSA)</th><th scope="col">Unemployment (%)</th></tr></thead><tbody id="table-body"></tbody></table></div></details></section>
+  <section class="section methodology" id="sources"><div><span class="eyebrow">05 / SOURCES &amp; METHOD</span><h2>Good data.<br>Clear boundaries.</h2><p>An independent project by <a href="https://github.com/Geezusotl">Giovannie Sosa</a>. Built to make public economic data easier to read and use.</p></div><div>
+    <details open><summary>Where the numbers come from</summary><p>All observations come directly from the U.S. Bureau of Labor Statistics. Data is monthly, not real-time. The dashboard checks for updates daily when its scheduled workflow is enabled. Preliminary values and historical revisions are retained.</p><ul id="source-list"></ul></details>
+    <details><summary>How the calculations work</summary><p>Annual change = (current value ÷ value in the same month a year earlier − 1) × 100. Real hourly pay growth = ((earnings now ÷ earnings then) ÷ (adjusted CPI now ÷ adjusted CPI then) − 1) × 100.</p><p>The comparison chart rebases each seasonally adjusted series to 100 in its first common month. The calculator uses unadjusted CPI: equivalent amount = original amount × target CPI ÷ starting CPI. It compares exact months, rather than mixing annual averages with partial-year data.</p></details>
+    <details><summary>What this cannot tell you</summary><p>National averages do not describe every household, place, or job. Average hourly earnings are not median earnings and exclude non-private-sector workers. Changes in worker composition affect the average. CPI measures price changes, not differences in living costs between locations. These charts do not establish what caused a change.</p></details>
+    <details><summary>Missing months and update reliability</summary><p>No observations are invented or interpolated. An annual change is unavailable when its exact year-earlier month is missing. A failed or incomplete data request keeps the previous valid snapshot. Each series shows its own observation month; a recent update check does not imply newer data.</p><p id="update-details"></p><a href="https://github.com/Geezusotl/purchasing-power/actions">Inspect the update history ↗</a></details>
+  </div></section>
+</main>
+<footer class="wrap"><span>Purchasing Power <span class="footer-divider">/</span> An independent look at the numbers.</span><span><a href="data/snapshot.json" download>Data snapshot</a><a href="https://github.com/Geezusotl/purchasing-power">Source code ↗</a></span></footer>
+</body></html>

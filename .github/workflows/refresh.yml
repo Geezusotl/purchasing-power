@@ -1,0 +1,70 @@
+name: Refresh data and publish dashboard
+on:
+  schedule:
+    - cron: '23 15 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'LICENSE'
+permissions:
+  contents: read
+concurrency:
+  group: purchasing-power-publish
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      refresh_failed: ${{ steps.update.outcome == 'failure' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check updater before using it
+        run: python -m unittest discover -s tests
+      - name: Retrieve and validate official BLS observations
+        id: update
+        continue-on-error: true
+        run: python scripts/update_data.py
+      - name: Save observations and update status
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/snapshot.json data.js status.json status.js
+          if ! git diff --staged --quiet; then
+            git commit -m 'Refresh BLS observations and collection status'
+            git push origin HEAD:main
+          fi
+      - name: Build current snapshot, including failure notice if needed
+        run: python scripts/build.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy current dashboard to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
+  report:
+    needs: [refresh, deploy]
+    if: always() && needs.refresh.outputs.refresh_failed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark failed collection visibly in Actions
+        run: |
+          echo 'BLS collection failed. The deployment keeps last-good data and displays a warning. Check refresh job logs.'
+          exit 1

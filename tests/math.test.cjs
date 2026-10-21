@@ -1,0 +1,14 @@
+const test=require('node:test'),assert=require('node:assert/strict'),M=require('../math.js');
+const series=data=>({data:data.map(([date,value])=>({date,value}))});
+const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
+test('equivalent salary follows CPI ratio',()=>close(M.equivalent(60000,100,125),75000));
+test('reverse conversion recovers original',()=>close(M.equivalent(M.equivalent(60000,100,125),125,100),60000));
+test('same month and zero amounts',()=>{assert.equal(M.equivalent(1234,200,200),1234);assert.equal(M.equivalent(0,200,300),0);});
+test('real earnings uses ratio, not percentage subtraction',()=>{close(M.realChange(110,100,105,100),4.761904761904767);assert.notEqual(M.realChange(110,100,105,100),5);});
+test('negative real growth and deflation',()=>{close(M.realChange(102,100,104,100),-1.9230769230769273);close(M.equivalent(100,100,90),90);});
+test('missing, nonfinite, and zero denominator never become data',()=>{for(const v of [null,undefined,NaN,Infinity]){assert.equal(M.change(v,100),null);assert.equal(M.equivalent(100,100,v),null);}assert.equal(M.change(100,0),null);assert.equal(M.equivalent(-1,100,110),null);});
+test('annual change uses exact year-earlier month',()=>{const s=series([['2024-09',100],['2024-10',null],['2025-09',110],['2025-10',115]]);close(M.yoy(s,'2025-09'),10);assert.equal(M.yoy(s,'2025-10'),null);});
+test('indexed series retains missing observations',()=>{const s=series([['2024-01',100],['2024-02',null],['2024-03',125]]);assert.deepEqual(M.indexed(s,'2024-01','2024-03').map(p=>p.value),[100,null,125]);});
+test('common date selection excludes unavailable values',()=>{assert.deepEqual(M.commonDates(series([['2024-01',1],['2024-02',2]]),series([['2024-01',null],['2024-02',3]])),['2024-02']);});
+test('paths break at explicit gaps and omitted months',()=>{const s=series([['2024-01',1],['2024-02',null],['2024-03',3],['2024-05',5],['2024-06',6]]);assert.deepEqual(M.segments(s.data).map(s=>s.length),[1,1,2]);});
+test('consecutive December and January stay connected',()=>assert.equal(M.segments(series([['2024-12',1],['2025-01',2]]).data).length,1));
