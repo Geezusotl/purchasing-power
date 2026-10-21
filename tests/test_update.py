@@ -76,15 +76,15 @@ class DataTests(unittest.TestCase):
     def test_snapshot_and_browser_data_identical(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); updater.publish(snapshot(),root,NOW)
-            serialized = root.joinpath('data.js').read_text().split('window.PP_DATA = ')[1].removesuffix(';\n')
-            self.assertEqual(json.loads(serialized),json.loads(root.joinpath('data/snapshot.json').read_text()))
+            serialized = root.joinpath('data.js').read_text(encoding='utf-8').split('window.PP_DATA = ')[1].removesuffix(';\n')
+            self.assertEqual(json.loads(serialized),json.loads(root.joinpath('data/snapshot.json').read_text(encoding='utf-8')))
 
     def test_no_change_preserves_observation_timestamp(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp); first=snapshot(); updater.publish(first,root,NOW)
             second=copy.deepcopy(first); second['retrievedAt']='2026-10-21T00:00:00+00:00'
             self.assertFalse(updater.publish(second,root,NOW))
-            self.assertEqual(json.loads(root.joinpath('data/snapshot.json').read_text())['retrievedAt'],first['retrievedAt'])
+            self.assertEqual(json.loads(root.joinpath('data/snapshot.json').read_text(encoding='utf-8'))['retrievedAt'],first['retrievedAt'])
 
     def test_revisions_are_published(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -104,7 +104,7 @@ class DataTests(unittest.TestCase):
             root=Path(tmp); updater.publish(snapshot(),root,NOW); before=root.joinpath('data/snapshot.json').read_bytes()
             updater.mark_failure(root,NOW)
             self.assertEqual(root.joinpath('data/snapshot.json').read_bytes(),before)
-            status=json.loads(root.joinpath('status.json').read_text()); self.assertFalse(status['ok']); self.assertIn('lastSuccess',status)
+            status=json.loads(root.joinpath('status.json').read_text(encoding='utf-8')); self.assertFalse(status['ok']); self.assertIn('lastSuccess',status)
 
     def test_retry_eventual_success(self):
         with patch.object(updater.urllib.request,'urlopen',side_effect=OSError('offline')) as request,patch.object(updater.time,'sleep'):

@@ -124,7 +124,7 @@ def write_atomic(path, content):
 def publish(snapshot, directory=ROOT, now=None):
     now = now or datetime.now(timezone.utc)
     path = directory / "data" / "snapshot.json"
-    old = json.loads(path.read_text()) if path.exists() else None
+    old = json.loads(path.read_text(encoding='utf-8')) if path.exists() else None
     # Reject silent truncation, including a successful API response with short history.
     if old:
         for key in SERIES:
@@ -148,7 +148,7 @@ def publish(snapshot, directory=ROOT, now=None):
 
 def mark_failure(directory, now):
     path = directory / "status.json"
-    previous = json.loads(path.read_text()) if path.exists() else {}
+    previous = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     status = {**previous, "lastAttempt": now.isoformat(timespec="seconds"), "ok": False, "error": "The latest BLS update failed validation or could not be fetched. The previous valid snapshot is still available."}
     write_atomic(path, json.dumps(status, indent=2) + "\n")
     write_atomic(directory / "status.js", "window.PP_STATUS = " + json.dumps(status) + ";\n")

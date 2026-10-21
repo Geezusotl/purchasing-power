@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def build():
-    snapshot = json.loads((ROOT / 'data/snapshot.json').read_text())
+    snapshot = json.loads((ROOT / 'data/snapshot.json').read_text(encoding='utf-8'))
     if snapshot.get('schemaVersion') != 1 or len(snapshot.get('series', {})) != 7:
         raise ValueError('Missing or invalid official data snapshot')
     target = ROOT / 'dist'
