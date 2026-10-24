@@ -1,1 +1,1 @@
-window.PP_STATUS = {"lastAttempt": "2026-10-23T19:22:12+00:00", "lastSuccess": "2026-10-23T19:22:12+00:00", "ok": true, "dataChanged": false, "dataRetrievedAt": "2026-10-20T20:30:12+00:00"};
+window.PP_STATUS = {"lastAttempt": "2026-10-24T18:15:29+00:00", "lastSuccess": "2026-10-23T19:22:12+00:00", "ok": false, "dataChanged": false, "dataRetrievedAt": "2026-10-20T20:30:12+00:00", "error": "The latest BLS update failed validation or could not be fetched. The previous valid snapshot is still available."};
