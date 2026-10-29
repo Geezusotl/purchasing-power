@@ -1,1 +1,1 @@
-window.PP_STATUS = {"lastAttempt": "2026-10-28T20:24:31+00:00", "lastSuccess": "2026-10-28T20:24:31+00:00", "ok": true, "dataChanged": false, "dataRetrievedAt": "2026-10-20T20:30:12+00:00"};
+window.PP_STATUS = {"lastAttempt": "2026-10-29T20:22:44+00:00", "lastSuccess": "2026-10-29T20:22:44+00:00", "ok": true, "dataChanged": false, "dataRetrievedAt": "2026-10-20T20:30:12+00:00"};
